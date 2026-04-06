@@ -1,13 +1,13 @@
 # Repo working rules
 
-This repository focuses on one vertical only: Chinese civil-service essay tasks (申论).
+This repository currently focuses on one vertical only: Chinese civil-service essay tasks (申论).
 
 When editing this repo:
-- Prefer adding supporting files under `.claude/skills/shenlun/` instead of making `SKILL.md` too long.
 - Keep the user-facing slash command stable as `/shenlun`.
-- Do not claim official grading parity unless a profile file explicitly defines it.
-- If materials are incomplete, proceed with a best-effort structure and clearly state the uncertainty.
-- Synthetic examples are acceptable; label them as synthetic.
+- Prefer supporting files under `.claude/skills/shenlun/` instead of bloating `SKILL.md`.
+- Treat any scoring rubric as an operational framework unless an explicit profile file says otherwise.
+- When the prompt materials are incomplete, continue with a best-effort structure and state the uncertainty.
+- Label synthetic essays and synthetic examples clearly.
 - Save generated reports under `outputs/`.
 
-Before broadening scope beyond 申论, update `docs/shenlun-branch-scope.md` first.
+Before expanding the repo beyond 申论, update `docs/shenlun-branch-scope.md` first.

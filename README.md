@@ -1,31 +1,54 @@
 # Claude Code Shenlun Skill
 
-一个面向 Claude Code 的申论 skill 仓库，当前分支 `feat/shenlun-core` 只聚焦申论主链路：审题分析、立意提纲、写作辅助、范文检索/生成、批改评分。
+把一篇申论题目或草稿，变成结构化审题、参考范文、分项评分和可视化批改报告。
 
-## 当前设计取向
+这个仓库当前只做一件事：把 **申论** 做成一个能直接演示、直接截图、直接传播的 Claude Code skill。首版不追求“大而全”的考公平台，而是先把最有传播力、最容易建立口碑的一条链路做透。
 
-这个分支不追求“大而全”的考公助手，而是先把申论做成一个能被演示、能被截图、能被传播的单点工具。对外只暴露一个主命令：`/shenlun`。
+## 能做什么
 
-这样做有两个好处：
+`/shenlun` 当前聚焦三类任务：
 
-1. 传播上简单：一句话就能讲明白，“一个命令完成申论审题、范文、批改”。
-2. 维护上收敛：冷启动阶段先把一条链路做透，后续再拆成更细的 skill 或接 MCP 数据源。
+- `analyze`：审题、题型判断、立意、提纲、写作辅助
+- `exemplar`：按主题检索本地参考范文；不匹配时生成 AI 参考范文
+- `grade`：对用户提交的申论进行分项评分、逐段点评、失分诊断和改写建议
 
-## 当前能力范围
-
-`/shenlun` 至少覆盖三类任务：
-
-1. `analyze`：题目分析讲解并辅助写作。
-2. `exemplar`：从本地范文库检索近似主题；检索不到时生成 AI 参考范文。
-3. `grade`：按内部操作化 rubric 对用户提交的申论进行打分、批改、改写。
-
-## 建议调用方式
+## 一句话示例
 
 `/shenlun analyze national examples/prompt-demo.md`
 
 `/shenlun exemplar national 基层治理`
 
 `/shenlun grade national examples/student-draft-demo.md`
+
+## 为什么先只做申论
+
+因为申论最适合 skill 形态：
+
+1. 输入天然结构化：题干、材料、作答要求、草稿。
+2. 输出天然可展示：提纲、范文、评分表、HTML 报告。
+3. 传播上更有冲击力：审题前后对比、低分稿改写、高分表达替换，都很适合截图和短视频。
+
+## 当前设计原则
+
+### 1. 单入口命令
+
+对外只保留一个命令 `/shenlun`，通过 mode 切换任务，降低记忆成本。
+
+### 2. 先检索，后生成
+
+范文模式优先检索本地样本库，只有相似样本不足时才生成新的 AI 参考范文，减少“每次都长得差不多”的问题。
+
+### 3. 内部评分框架而非“官方原文”
+
+`rubric.md` 与 `profiles/` 下的内容是仓库内部的操作化框架，目的是让批改更稳定，而不是伪装成真实考试机构的官方评分条文。
+
+### 4. 输出要可落地
+
+所有模式都要求输出能直接拿去练习，而不是停留在泛泛建议层：
+
+- `analyze` 要给可写作提纲
+- `exemplar` 要说明可借鉴点
+- `grade` 要给失分证据、局部改写和 7 天提升计划
 
 ## 仓库结构
 
@@ -35,51 +58,99 @@
 ├── references/
 │   ├── modes.md
 │   ├── rubric.md
+│   ├── phrases.md
 │   ├── exemplar-policy.md
+│   ├── profiles/
+│   │   ├── national.md
+│   │   ├── beijing.md
+│   │   └── jiangsu-a.md
 │   └── exemplars/
 │       ├── community-governance.md
 │       ├── digital-governance.md
-│       └── rural-revitalization.md
+│       ├── rural-revitalization.md
+│       ├── elderly-care.md
+│       ├── grassroots-burden-reduction.md
+│       ├── business-environment.md
+│       ├── employment-first.md
+│       ├── emergency-response.md
+│       ├── ecological-governance.md
+│       └── cultural-renewal.md
 ├── scripts/
-│   └── render_report.py
+│   ├── render_report.py
+│   └── build_exemplar_index.py
 └── templates/
-    └── grading-report.json.example
+    ├── grading-report.json.example
+    └── analysis-output.md
 examples/
 ├── prompt-demo.md
-└── student-draft-demo.md
+├── topic-material-01.md
+├── student-draft-demo.md
+├── student-draft-weak.md
+└── student-draft-revised.md
 docs/
 ├── roadmap.md
-└── shenlun-branch-scope.md
+├── shenlun-branch-scope.md
+└── demo-script.md
+eval/
+├── cases.md
+└── rubric-checklist.md
+outputs/
+└── demo-report.html
 ```
 
-## 设计原则
+## 快速安装
 
-### 1. 单命令入口
+把整个 `.claude/skills/shenlun` 目录拷到你的项目里即可。
 
-用户只需要记住 `/shenlun`，其余通过 mode 参数切换。
+项目级安装示例：
 
-### 2. 范文能力分两层
+`mkdir -p .claude/skills && cp -R /path/to/this-repo/.claude/skills/shenlun .claude/skills/`
 
-先查本地 AI 参考范文库，再决定是否生成新的参考范文。这样演示更稳定，也便于后续扩展成真正的检索库。
+## 建议演示顺序
 
-### 3. 评分与“官方标准”分离
+### 演示一：审题到写作
 
-当前 `rubric.md` 是为了让批改输出稳定、可复现、可迭代的“内部操作化评分框架”，不是官方阅卷标准原文。
+`/shenlun analyze national examples/topic-material-01.md`
 
-### 4. 输出尽量结构化
+预期看到：题型判断、核心矛盾、主立意、提纲、可直接起笔的正文框架。
 
-批改任务不仅给总评，还要求给分项分、失分证据、局部改写、整篇提升方案，并可选生成 HTML 报告。
+### 演示二：主题范文检索
 
-## 这版还没有做的事
+`/shenlun exemplar national 基层治理`
 
-1. 没接入实时政策/时评/公告数据源。
-2. 没接真实年份和地区的精细评分 profile。
-3. 没做 benchmark/eval 自动化。
-4. 没把范文库扩到真正可用的规模。
+预期看到：相似主题样本、每篇可借鉴点、必要时给出新的 AI 参考范文。
 
-## 下一步最值钱的增量
+### 演示三：批改打分
 
-1. 补 20–30 篇高质量 AI 参考范文与题材索引。
-2. 加 10 个标准化评测 case，做前后对比截图。
-3. 把 `grade` 输出接成视觉化 HTML 报告。
-4. 再决定是否拆成更细的 skill。
+`/shenlun grade national examples/student-draft-weak.md`
+
+预期看到：总分、分项分、逐段点评、关键失分点、建议改写。
+
+### 演示四：导出 HTML 报告
+
+`python .claude/skills/shenlun/scripts/render_report.py .claude/skills/shenlun/templates/grading-report.json.example outputs/demo-report.html`
+
+## 适合做内容传播的展示点
+
+1. **低分稿 → 改写稿**：最容易形成转发。
+2. **审题拆解卡**：适合做图文封面。
+3. **分项评分雷达图/报告**：更容易建立“专业感”。
+4. **同一主题多篇范文对比**：有利于引发评论区讨论。
+
+## 这版还不做什么
+
+- 不做行测
+- 不做职位表匹配
+- 不做实时招录公告抓取
+- 不承诺与真实阅卷口径一一对应
+
+## 下一步优先级
+
+1. 扩充本地范文库到 20–30 篇
+2. 补 10 个标准化评测样本
+3. 增加 profile 化权重和题型约束
+4. 优化 HTML 报告样式，适合截图传播
+
+## 许可证
+
+MIT

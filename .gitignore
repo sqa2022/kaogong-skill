@@ -2,5 +2,6 @@
 *.pyc
 __pycache__/
 *.log
-outputs/*
+outputs/*.json
+outputs/*.html
 !outputs/demo-report.html
