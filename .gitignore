@@ -1,7 +1,0 @@
-.DS_Store
-*.pyc
-__pycache__/
-*.log
-outputs/*.json
-outputs/*.html
-!outputs/demo-report.html

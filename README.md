@@ -20,6 +20,15 @@
 
 `/shenlun grade national examples/student-draft-demo.md`
 
+## 命令入口已补齐
+
+这个仓库现在包含真正的项目级 slash command：
+
+- `.claude/commands/shenlun.md`
+- `.claude/skills/shenlun/`
+
+也就是说，README 里写的 `/shenlun ...` 不再只是文案，而是和仓库结构对齐的真实入口。
+
 ## 为什么先只做申论
 
 因为申论最适合 skill 形态：
@@ -53,34 +62,43 @@
 ## 仓库结构
 
 ```text
-.claude/skills/shenlun/
-├── SKILL.md
-├── references/
-│   ├── modes.md
-│   ├── rubric.md
-│   ├── phrases.md
-│   ├── exemplar-policy.md
-│   ├── profiles/
-│   │   ├── national.md
-│   │   ├── beijing.md
-│   │   └── jiangsu-a.md
-│   └── exemplars/
-│       ├── community-governance.md
-│       ├── digital-governance.md
-│       ├── rural-revitalization.md
-│       ├── elderly-care.md
-│       ├── grassroots-burden-reduction.md
-│       ├── business-environment.md
-│       ├── employment-first.md
-│       ├── emergency-response.md
-│       ├── ecological-governance.md
-│       └── cultural-renewal.md
-├── scripts/
-│   ├── render_report.py
-│   └── build_exemplar_index.py
-└── templates/
-    ├── grading-report.json.example
-    └── analysis-output.md
+.claude/
+├── commands/
+│   └── shenlun.md
+└── skills/
+    └── shenlun/
+        ├── SKILL.md
+        ├── references/
+        │   ├── modes.md
+        │   ├── rubric.md
+        │   ├── phrases.md
+        │   ├── exemplar-policy.md
+        │   ├── profiles/
+        │   │   ├── national.md
+        │   │   ├── beijing.md
+        │   │   └── jiangsu-a.md
+        │   └── exemplars/
+        │       ├── community-governance.md
+        │       ├── digital-governance.md
+        │       ├── rural-revitalization.md
+        │       ├── elderly-care.md
+        │       ├── grassroots-burden-reduction.md
+        │       ├── business-environment.md
+        │       ├── employment-first.md
+        │       ├── emergency-response.md
+        │       ├── ecological-governance.md
+        │       └── cultural-renewal.md
+        ├── scripts/
+        │   ├── render_report.py
+        │   └── build_exemplar_index.py
+        └── templates/
+            ├── grading-report.json.example
+            └── analysis-output.md
+.github/
+└── workflows/
+    └── shenlun-smoke.yml
+scripts/
+└── smoke_test.py
 examples/
 ├── prompt-demo.md
 ├── topic-material-01.md
@@ -100,11 +118,11 @@ outputs/
 
 ## 快速安装
 
-把整个 `.claude/skills/shenlun` 目录拷到你的项目里即可。
+把命令入口和 skill 一起拷到你的项目里。
 
 项目级安装示例：
 
-`mkdir -p .claude/skills && cp -R /path/to/this-repo/.claude/skills/shenlun .claude/skills/`
+`mkdir -p .claude/commands .claude/skills && cp /path/to/this-repo/.claude/commands/shenlun.md .claude/commands/ && cp -R /path/to/this-repo/.claude/skills/shenlun .claude/skills/`
 
 ## 建议演示顺序
 
@@ -129,6 +147,22 @@ outputs/
 ### 演示四：导出 HTML 报告
 
 `python .claude/skills/shenlun/scripts/render_report.py .claude/skills/shenlun/templates/grading-report.json.example outputs/demo-report.html`
+
+## 最小回归测试已补齐
+
+这个仓库现在包含最小 smoke test，用来防止“README 写得很像能用，但改一版就坏掉”。
+
+CI 会检查：
+
+- `/shenlun` 命令文件是否存在
+- 关键 skill/rubric/profile 文件是否存在
+- 范文索引脚本是否能成功生成索引
+- 评分 JSON 示例是否包含必需字段
+- HTML 报告脚本是否能成功产出带雷达图的页面
+
+本地运行一行即可：
+
+`python scripts/smoke_test.py`
 
 ## 适合做内容传播的展示点
 
